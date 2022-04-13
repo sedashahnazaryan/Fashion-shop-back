@@ -14,6 +14,7 @@ public class FileDatasource {
 
     }
 
+
     private void createDataFolder() {
 
         dataFolder = new File(new File("").getAbsolutePath() + File.separator + FileConstants.DATA_FOLDER_NAME);
@@ -42,17 +43,22 @@ public class FileDatasource {
     public   String getFolderPathByProduct(Product product){
         return dataFolder.getPath()+File.separator+product.getName()+"_"+product.getId();
     }
-public  static void deleteProductFolderByFolderName(String folderName){
-    File imageFolder = new File(
-            new File("").getAbsolutePath() +
-                    File.separator
-                    + FileConstants.DATA_FOLDER_NAME
-                    + File.separator
-                    + folderName);
-    try {
-        FileUtils.deleteDirectory(imageFolder);
-    } catch (IOException e) {
-        e.printStackTrace();
+
+    public void deleteProductFolderByFolderName(String folderName){
+        File imageFolder = new File(
+                new File("").getAbsolutePath() +
+                        File.separator
+                        + FileConstants.DATA_FOLDER_NAME
+                        + File.separator
+                        + folderName);
+        try {
+            FileUtils.deleteDirectory(imageFolder);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
-}
+
+
+
+

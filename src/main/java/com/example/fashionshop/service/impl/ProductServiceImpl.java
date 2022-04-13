@@ -22,38 +22,62 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+
+    /***
+     *
+     * @return all data from DB, if there is not any data will return empty List.
+     */
     @Override
     public List<Product> getAll() {
         return productRepository.findAll();
     }
 
+    /***
+     *
+     * @return the product with provided ID
+     */
+    @Override
+    public Product getById(Long id) {
+        return productRepository.findById(id).orElseThrow(()->{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "product with id:" + id + "  not found in database");
+        });
+    }
+
+//    /***
+//     *
+//     * @param anytext
+//     * @return
+//     */
+//
+//    @Override
+//    public List<Product> getByAnyText(String anytext) {
+//      List<Product> filter = getAll().stream().filter((item)->
+//                     item.toString().toLowerCase(Locale.ROOT).contains(anytext.toLowerCase(Locale.ROOT)))
+//                .collect(Collectors.toList());
+//        return filter;
+//    }
+
+    /***
+     *
+     * @param product the product that would be added in DB
+     * @return new product which has added
+     */
     @Override
     public Product create(Product product) {
         return productRepository.save(product);
     }
 
 
+    /***
+     *
+     * @param id is related to product which need to update
+     * @param product is changed data
+     * @returns just updated product
+     */
     @Override
-    public Product getById(long id) {
-        return productRepository
-                .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "product with id:" + id + "  not found in database")
-                );
-    }
-
-    @Override
-    public List<Product> getByAnyText(String anytext) {
-        List<Product> filter = getAll().stream().filter((item)->
-                        item.toString().toLowerCase(Locale.ROOT).contains(anytext.toLowerCase(Locale.ROOT)))
-                .collect(Collectors.toList());
-        return filter;
-    }
-
     @Transactional
-    @Override
-    public Product update(long id, Product product) {
+    public Product update(Product product, long id) {
         Product dbProduct = productRepository.findById(id).orElseThrow(()->{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "product with id:" + id + "  not found in database");
@@ -67,14 +91,13 @@ public class ProductServiceImpl implements ProductService {
         return  dbProduct;
     }
 
-
-
+    /***
+     *
+     * @param id find the product with provided id and deletes both the image folder
+     *           corresponding to the product and the product
+     */
     @Override
     public void delete(long id) {
         productRepository.deleteById(id);
     }
-
-
 }
-
-

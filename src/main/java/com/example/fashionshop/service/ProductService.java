@@ -8,13 +8,13 @@ public interface ProductService {
 
     Product create(Product product);
 
-    Product getById(long id);
+    Product getById(Long id);
 
     List<Product> getAll();
 
-    Product update(long id, Product product);
+    Product update( Product product,long id);
 
     void delete(long id);
 
-    List<Product> getByAnyText(String anytext);
+//    List<Product> getByAnyText(String anytext);
 }
