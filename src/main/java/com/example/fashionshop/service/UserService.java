@@ -9,9 +9,12 @@ public interface UserService {
     User create(User user);
 
     User getById(String id);
-//    User getByIdForSingUp(String id);
 
-//    List<User> getAll();
-//
-//    void delete(String id);
+    User getByIdForSingUp(String id);
+
+    boolean isExists(String id);
+
+    List<User> getAll();
+
+    void delete(String id);
 }

@@ -40,6 +40,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Autowired
     private ImageRepository imageRepository;
+
     /***
      *
      * @param productId finds the product that will be attached with image
@@ -63,7 +64,6 @@ public class ImageServiceImpl implements ImageService {
             String fileName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
             Path uploadDirectory = Paths.get(productFolder);
             String imgUrl = serverUrl + "/" + generateFolderName(product) + "/" + fileName;
-//            System.out.println("imagePath\t" + imagePath);
             imagesForDb.add(new Image(imgUrl));
             try (InputStream inputStream = image.getInputStream()) {
                 Path filePath = uploadDirectory.resolve(fileName);
@@ -76,13 +76,11 @@ public class ImageServiceImpl implements ImageService {
                 }
             }
         }
-
-        if (product.getImg() == null){
+        if (product.getImg() == null) {
             product.setImg(imagesForDb);
-        }else {
+        } else {
             product.getImg().addAll(imagesForDb);
         }
-
         return product;
     }
 
@@ -94,8 +92,7 @@ public class ImageServiceImpl implements ImageService {
      * @throws IOException throws exception when the process has failed
      */
     @Override
-    public byte[] readByFolderNameAndImageName(String folderName, String imageName)
-            throws IOException {
+    public byte[] readByFolderNameAndImageName(String folderName, String imageName) throws IOException {
         //get file
         File file = new File(
                 new File("").getAbsolutePath() +
@@ -108,7 +105,6 @@ public class ImageServiceImpl implements ImageService {
         );
         InputStream inputStream = new FileInputStream(file);
         return StreamUtils.copyToByteArray(inputStream);
-
     }
 
     /***
@@ -132,13 +128,13 @@ public class ImageServiceImpl implements ImageService {
         fromDb.setImg(new LinkedList<>());
 
         List<Image> imagesForDb = new LinkedList<>();
+// create directory
 
+// iterate for any image
         for (MultipartFile image : images) {
-
             String fileName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
             Path uploadDirectory = Paths.get(productFolder);
-            String imgUrl = serverUrl + "/" + generateFolderName(fromDb) + "/" + fileName;
-//            System.out.println("imagePath\t" + imagePath);
+            String imgUrl  = serverUrl + "/" + generateFolderName(fromDb) + "/" + fileName;;
             imagesForDb.add(new Image(imgUrl));
             try (InputStream inputStream = image.getInputStream()) {
                 Path filePath = uploadDirectory.resolve(fileName);
@@ -163,20 +159,14 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public void delete(long id) {
         new FileDatasource().deleteProductFolderByFolderName(generateFolderName(productRepository.getById(id)));
-
     }
-
 
     /***
      *
      * @param product creates the image folder depending on the provided product name and product id
      * @return generated folder name
      */
-    private String generateFolderName(Product product){
-        return product.getName()+"_"+product.getId();
+    private String generateFolderName(Product product) {
+        return product.getName() + "_" + product.getId();
     }
 }
-
-
-
-

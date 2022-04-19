@@ -11,8 +11,7 @@ public interface ImageService {
 
     byte[] readByFolderNameAndImageName(String folderName, String imageName) throws IOException;
 
+    Image update(long productId, MultipartFile[] images, String serverUrl);
 
-
-    Image update(long productId,MultipartFile[] images, String serverUrl);
-    void delete (long id);
+    void delete(long id);
 }

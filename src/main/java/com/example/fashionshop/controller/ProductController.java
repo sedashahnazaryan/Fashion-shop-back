@@ -1,7 +1,7 @@
 package com.example.fashionshop.controller;
 
 import com.example.fashionshop.model.Product;
-import com.example.fashionshop.model.dto.requestDto.ResponseDto;
+import com.example.fashionshop.model.dto.responseDto.ResponseDto;
 import com.example.fashionshop.service.ImageService;
 import com.example.fashionshop.service.ProductService;
 import com.example.fashionshop.validation.ProductValidator;
@@ -21,9 +21,38 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
     @Autowired
     private ImageService imageService;
 
+    /***
+     *
+     * @param product  is made from the provided information by front-end which includes
+     *                  •name
+     *                  •price
+     *                  •additional product details
+     * @param userId property is used to determine if the user has authorisation to make changes in database
+     * @return responseDto to inform front-end that process has been done successfully/ failed
+     */
+    @PostMapping
+    ResponseEntity<ResponseDto> create(@RequestBody Product product,
+                                       @RequestHeader String userId) {
+        UserValidator.checkUserAuthorized(userId,HttpStatus.UNAUTHORIZED, ValidationConstants.UNAUTHORIZED_ERROR);
+        ProductValidator.validateCreateProduct(product, HttpStatus.BAD_REQUEST, "product data is invalid to add in DB");
+        Product created = productService.create(product);
+        ResponseDto responseDto = new ResponseDto("Product created.");
+        responseDto.addInfo("productId", String.valueOf(created.getId()));
+        return ResponseEntity.ok(responseDto);
+    }
+
+    /***
+     *
+     * @return all products
+     */
+    @GetMapping()
+    ResponseEntity<List<Product>> getAll() {
+        return ResponseEntity.ok(productService.getAll());
+    }
 
     /***
      *
@@ -37,58 +66,32 @@ public class ProductController {
 
     /***
      *
-     * @return  all the  products
-     */
-    @GetMapping()
-    ResponseEntity<List<Product>> getAll() {
-        return ResponseEntity.ok(productService.getAll());
-    }
-
-    /***
-     *
-     * @param product is made from the provided information  by front-end which includes
-     *                 •name
-     *                 •price
-     *                 •additional product details
+     * @param id is to get the necessary product which will be updated
+     * @param product is the new information to update product
      * @param userId property is used to determine if the user has authorisation to make changes in database
      * @return responseDto to inform front-end that process has been done successfully/ failed
      */
-
-    @PostMapping
-    ResponseEntity<ResponseDto> create(@RequestBody Product product,
-                                       @RequestHeader String userId){
-        UserValidator.checkUserAuthorized(userId,HttpStatus.UNAUTHORIZED, ValidationConstants.UNAUTHORIZED_ERROR);
-        ProductValidator.validateCreateProduct(product, HttpStatus.BAD_REQUEST, "product data is invalid to add in DB");
-        Product created = productService.create(product);
-        ResponseDto responseDto = new ResponseDto("Product created.");
-        responseDto.addInfo("productId", String.valueOf(created.getId()));
-        return ResponseEntity.ok(responseDto);
-
-    }
-
-    /***
-     *
-     * @param id is to get the
-     * @param product
-     * @param userId
-     * @return
-     */
-
     @PutMapping("/{id}")
-    ResponseEntity<ResponseDto> update(@PathVariable Long id,
+    ResponseEntity<ResponseDto> update(@PathVariable long id,
                                        @RequestBody Product product,
-                                       @RequestHeader String userId){
+                                       @RequestHeader String userId) {
         UserValidator.checkUserAuthorized(userId,HttpStatus.UNAUTHORIZED, ValidationConstants.UNAUTHORIZED_ERROR);
         ProductValidator.validateUpdateProduct(product, HttpStatus.BAD_REQUEST, "products data that you want to update does not matches to the product structure");
-
-        Product updated = productService.update(product, id);
+        Product updated = productService.update(id, product);
         ResponseDto responseDto = new ResponseDto("Product updated.");
         responseDto.addInfo("productId", String.valueOf(updated.getId()));
         return ResponseEntity.ok(responseDto);
     }
 
+    /***
+     *
+     * @param id is to find the product which will be deleted
+     * @param userId property is used to determine if the user has authorisation to make changes in database
+     * @return responseDto to inform front-end that process has been done successfully/ failed
+     */
     @DeleteMapping("/{id}")
-    ResponseEntity<ResponseDto> delete(@PathVariable long id, @RequestHeader String userId){
+    ResponseEntity<ResponseDto> delete(@PathVariable long id,
+                                       @RequestHeader String userId){
         ProductValidator.validateDeleteProduct(userId, HttpStatus.UNAUTHORIZED, "wrong");
         imageService.delete(id);
         productService.delete(id);
@@ -96,7 +99,4 @@ public class ProductController {
         responseDto.addInfo("productId", String.valueOf(id));
         return ResponseEntity.ok(responseDto);
     }
-
-
 }
-

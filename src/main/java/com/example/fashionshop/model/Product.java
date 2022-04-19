@@ -57,6 +57,7 @@ public class Product {
             stock.setIsAvailable(false);
         }
     }
+
     @Override
     public String toString() {
         return "" +
@@ -68,5 +69,4 @@ public class Product {
                 "" + stock +
                 "" + img;
     }
-
 }

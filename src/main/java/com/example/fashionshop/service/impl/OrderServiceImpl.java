@@ -2,7 +2,6 @@ package com.example.fashionshop.service.impl;
 
 import com.example.fashionshop.model.Order;
 import com.example.fashionshop.model.Product;
-import com.example.fashionshop.model.commons.Stock;
 import com.example.fashionshop.model.commons.enums.OrderStatus;
 import com.example.fashionshop.model.dto.requestDto.OrderUpdateReqDto;
 import com.example.fashionshop.repository.OrderRepository;
@@ -15,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,21 +31,70 @@ public class OrderServiceImpl implements OrderService {
 
     /***
      *
+     * @param order the product that would be added in DB
+     * @return new product which has added
+     */
+    @Override
+    public Order create(Order order) {
+        order.setOrderStatus(OrderStatus.PENDING);
+        return orderRepository.save(order);
+    }
+
+    /***
+     *
      * @return all data from DB, if there is not any data will return empty List.
      */
     @Override
     public List<Order> getAll() {
-        return orderRepository.findAll();
+        List<Order> all = orderRepository.findAll();
+        Collections.sort(all, new Comparator<Order>() {
+            @Override
+            public int compare(Order o1, Order o2) {
+                return (int) (o2.getDate()- o1.getDate());
+            }
+        });
+        return all;
+    }
+
+    /***
+     *
+     * @param id with the help of it will find the object from DB.
+     * @return returns founded object or throws @ResponseStatusException(BAD_REQUEST).
+     */
+    @Override
+    public List<Order> getAllById(String id) {
+        return orderRepository
+                .getAllByUserId(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Orders with user_id:" + id + "  not found in database")
+                );
     }
 
     @Override
-    public Order getOrderById(long orderId) {
+    public Order getOrdersByUserId(long orderId) {
         return orderRepository.findById(orderId).orElseThrow(
                 () -> new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
                         "order with id:" + orderId + "  not found in database")
         );
     }
+
+//    @Transactional
+//    @Override
+//    public Order update(String id, OrderUpdateReqDto reqDto) {
+//        Order fromDb = orderRepository
+//                .findById(id)
+//                .orElseThrow(() -> new ResponseStatusException(
+//                        HttpStatus.BAD_REQUEST,
+//                        "product with id:" + id + "  not found in database")
+//                );
+//        fromDb.setCount(reqDto.getCount());
+//        fromDb.setOrderStatus(reqDto.getOrderStatus());
+//
+//        return fromDb;
+//        return null;
+//    }
 
     /***
      *
@@ -55,20 +105,9 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public List<Order> getOrderByStatus(String userId, OrderStatus orderStatus) {
-        return getAllById(userId).stream()
-                .filter(item -> item.getOrderStatus() == orderStatus)
+        return getAll().stream()
+                .filter(item->item.getOrderStatus()==orderStatus)
                 .collect(Collectors.toList());
-    }
-
-    /***
-     *
-     * @param order is the product that will be added in DB
-     * @return new product which has added
-     */
-    @Override
-    public Order create(Order order) {
-        order.setOrderStatus(OrderStatus.UNPAID);
-        return orderRepository.save(order);
     }
 
     /***
@@ -89,20 +128,6 @@ public class OrderServiceImpl implements OrderService {
 
     /***
      *
-     * @param id with the help of it will find the object from DB.
-     * @return returns founded object or throws @ResponseStatusException(BAD_REQUEST).
-     */
-    @Override
-    public List<Order> getAllById(String id) {
-        return orderRepository.getAllByUserId(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Orders with user_id:" + id + "  not found in database")
-                );
-    }
-
-    /***
-     *
      * @param id find the order with provided id and deletes it
      */
     @Override
@@ -110,3 +135,5 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.deleteById(id);
     }
 }
+
+

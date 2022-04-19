@@ -1,28 +1,31 @@
-package com.example.fashionshop.model.dto.requestDto;
+package com.example.fashionshop.model.dto.responseDto;
 
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
 
+
 @ToString
+@RequiredArgsConstructor
 public class ResponseDto {
     private HttpStatus httpStatus;
-    private  String message;
+    private String message;
     private Map<String, String> info;
 
-
-    public ResponseDto(String message) {
-        this.message = message;
-        this.httpStatus = HttpStatus.OK;
-        this.info = new HashMap<>();
+    public ResponseDto(String message){
+        this.message=message;
+        this.httpStatus=HttpStatus.OK;
+        this.info=new HashMap<>();
     }
 
     public ResponseDto(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;
         this.message = message;
-        this.info = new HashMap<>();
+        this.info=new HashMap<>();
     }
 
     public HttpStatus getHttpStatus() {
@@ -45,7 +48,8 @@ public class ResponseDto {
         return info;
     }
 
-    public void addInfo(String key, String value){
+    public void addInfo(String key,String value){
         info.put(key, value);
     }
+
 }

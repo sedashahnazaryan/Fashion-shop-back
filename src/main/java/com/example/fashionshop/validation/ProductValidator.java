@@ -7,7 +7,6 @@ import com.example.fashionshop.validation.commons.StockValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-
 public final class ProductValidator {
     public static void validateUpdateProduct(Product product, HttpStatus status, String message) {
 //        ImageValidator.checkDefaultImage(product);
@@ -18,6 +17,7 @@ public final class ProductValidator {
             throw new ResponseStatusException(status, message);
         }
     }
+
     public static void validateCreateProduct(Product product, HttpStatus status, String message) {
         validateUpdateProduct(product, status, message);
     }
